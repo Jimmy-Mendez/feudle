@@ -57,7 +57,7 @@ function isAnswerCorrect(userAnswer, answers) {
 // Adjusted submitAnswers to handle new format
 // Assuming selectedQuestions is declared in a higher scope, e.g., right after parseCSV is called
 let allQuestions = parseCSV(csvContent); // Ensure this is accessible globally or in a higher scope
-const selectedQuestions = selectRandomQuestions(questions);
+const selectedQuestions = selectRandomQuestions(allQuestions);
 // Corrected submitAnswers function
 function submitAnswers() {
     let score = 0;
