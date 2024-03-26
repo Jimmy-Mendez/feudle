@@ -8,4 +8,7 @@ data_6_ans = pd.read_excel(open('quizzes.xlsx', 'rb'), sheet_name='6 Answers')
 data_7_ans = pd.read_excel(open('quizzes.xlsx', 'rb'), sheet_name='7 Answers') 
 
 data = pd.concat([data,data_3_ans,data_4_ans,data_5_ans,data_6_ans,data_7_ans])
+data['Question'] = data['Question'].str.replace('’', '')
+data['Question'] = data['Question'].str.replace('\"', '')
+data['Question'] = data['Question'].str.replace(',', '')
 data.to_csv('quizzes.csv',index=False)
