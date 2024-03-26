@@ -50,17 +50,26 @@ function isAnswerCorrect(userAnswer, answers) {
 }
 
 // Adjusted submitAnswers to handle new format
+// Assuming selectedQuestions is declared in a higher scope, e.g., right after parseCSV is called
+let selectedQuestions = parseCSV(csvContent); // Ensure this is accessible globally or in a higher scope
+
+// Corrected submitAnswers function
 function submitAnswers() {
-    const containers = document.getElementById('quiz-container').children;
     let score = 0;
-    Array.from(containers).forEach((container, index) => {
-        const userAnswer = document.getElementById(`answer-${index}`).value;
-        const { answers } = selectedQuestions[index];
+    // Ensure selectedQuestions is accessible here
+    Array.from(document.getElementById('quiz-container').children).forEach((container, index) => {
+        const userAnswer = document.getElementById(`answer-${index}`).value.toLowerCase().trim();
+        const { answers } = selectedQuestions[index]; // Make sure this references the globally accessible selectedQuestions
+
+        // Check if userAnswer is correct
         answers.forEach(answer => {
-            if (isAnswerCorrect(userAnswer, answers)) {
+            if (userAnswer === answer.answer.toLowerCase().trim()) {
                 score += answer.points;
             }
         });
     });
     document.getElementById('result').textContent = `Your score: ${score}`;
 }
+
+// Make sure to call displayQuestions somewhere in your code to actually display the questions
+displayQuestions(selectedQuestions);
