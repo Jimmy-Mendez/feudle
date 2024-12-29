@@ -1,46 +1,50 @@
-from gensim.models import KeyedVectors
+import os
+import numpy as np
+from openai import OpenAI
 
-# # Load Word2Vec model 
-# model_path = 'google_news_vectors.bin'
-# word_vectors = KeyedVectors.load_word2vec_format(model_path, binary=True)
+client = OpenAI(
+  api_key=os.environ['OPENAI_API_KEY'], 
+)
+
+def get_embedding(text, model="text-embedding-ada-002"):
+    """Fetch the embedding for the given text using OpenAI API."""
+    response = client.embeddings.create(
+        input=text,
+        model=model
+    )
+    return np.array(response.data[0].embedding)
 
 
-def find_best_match(input_word, possible_answers, model, threshold=0.6):
+def cosine_similarity(vec1, vec2):
+    """Calculate the cosine similarity between two vectors."""
+    return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+
+def find_best_match(input_word, possible_answers, model=None, threshold=0.85):
     best_match = None
     highest_similarity = threshold
     possible_answers = [x for x in possible_answers if str(x) != 'nan']
 
-    # Preprocess input to handle multi-word inputs
-    input_words = input_word.lower().split()
+    # Get embedding for the input word
+    input_embedding = get_embedding(input_word)
 
     for answer in possible_answers:
-        answer_words = answer.lower().split()
-        total_similarity = 0
-        count = 0
+        try:
+            # Get embedding for the answer
+            answer_embedding = get_embedding(answer)
 
-        for input_w in input_words:
-            for answer_w in answer_words:
-                try:
-                    # Calculate similarity between each word
-                    similarity = model.similarity(input_w, answer_w)
-                    total_similarity += similarity
-                    count += 1
-                except KeyError:  # If the word is not in the vocabulary
-                    continue
-        
-        # Calculate average similarity for multi-word inputs and answers
-        if count > 0:
-            avg_similarity = total_similarity / count
-            if avg_similarity > highest_similarity:
+            # Calculate similarity
+            similarity = cosine_similarity(input_embedding, answer_embedding)
+            if similarity > highest_similarity:
                 best_match = answer
-                highest_similarity = avg_similarity
+                highest_similarity = similarity
+        except Exception as e:
+            print(f"Error processing answer '{answer}': {e}")
+            continue
 
     return best_match
-
-
 
 # Example usage
 # user_input = "fireman"
 # possible_answers = ["police officer", "firefighter", "performer"]
-# best_match = find_best_match(user_input, possible_answers, word_vectors)
+# best_match = find_best_match(user_input, possible_answers)
 # print(f"Best match for '{user_input}': {best_match}")
