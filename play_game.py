@@ -4,8 +4,8 @@ from gensim.models import KeyedVectors
 import numpy as np
 
 # Load Word2Vec model 
-model_path = 'google_news_vectors.bin'
-word_vectors = KeyedVectors.load_word2vec_format(model_path, binary=True)
+# model_path = 'google_news_vectors.bin'
+# word_vectors = KeyedVectors.load_word2vec_format(model_path, binary=True)
 
 
 def check_match(row, usr_input):
@@ -13,7 +13,7 @@ def check_match(row, usr_input):
     ans = [row[1], row[3], row[5], row[7], row[9], row[11], row[13]]
     pts = [float(row[2]), float(row[4]), float(row[6]), float(row[8]), float(row[10]), float(row[12]), float(row[14])]
 
-    best_match = find_best_match(usr_input, ans, word_vectors)
+    best_match = find_best_match(usr_input, ans)
     if best_match == None:
         return (None, 0)
     ans_idx = ans.index(best_match)
